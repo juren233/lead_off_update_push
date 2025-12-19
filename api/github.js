@@ -1,5 +1,8 @@
-function escapeMarkdownV2(text) {
-  return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, "\\$&");
+function escapeHTML(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 module.exports = async function handler(req, res) {
@@ -22,11 +25,11 @@ module.exports = async function handler(req, res) {
       .map(l => l.trim())
       .filter(Boolean);
 
-    const title = escapeMarkdownV2(lines[0]);
+    const title = escapeHTML(lines[0]);
     const bodyLines = lines.slice(1, 6);
 
-    const quotedBody = bodyLines.length
-      ? bodyLines.map(l => `> ${escapeMarkdownV2(l)}`).join("\n")
+    const blockquote = bodyLines.length
+      ? `<blockquote>${escapeHTML(bodyLines.join("\n"))}</blockquote>`
       : "";
 
     const time = new Date(commit.timestamp).toLocaleString(
@@ -37,15 +40,16 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    // 🔥 关键在这里：精确控制换行
-    const text =
-`\n🚀 Leap Off 更新
+    const text = `
+🚀 Leap Off 更新
 
-${title}${quotedBody ? `\n${quotedBody}` : ""}
+${title}
+${blockquote ? `\n${blockquote}` : ""}
 
 ————————
 
-🕒 ${time}`;
+🕒 ${time}
+`.trim();
 
     const resp = await fetch(
       `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage`,
@@ -55,7 +59,7 @@ ${title}${quotedBody ? `\n${quotedBody}` : ""}
         body: JSON.stringify({
           chat_id: process.env.TG_CHAT_ID,
           text,
-          parse_mode: "MarkdownV2",
+          parse_mode: "HTML",
           disable_web_page_preview: true,
           reply_markup: {
             inline_keyboard: [
