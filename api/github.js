@@ -17,20 +17,18 @@ module.exports = async function handler(req, res) {
       return res.status(200).send("No commit found");
     }
 
-    // 拆分 commit message
     const lines = commit.message
       .split("\n")
       .map(l => l.trim())
       .filter(Boolean);
 
-    const title = escapeMarkdownV2(lines[0]); // 标题（不进引用块）
-    const bodyLines = lines.slice(1, 6);      // 正文最多 5 行
+    const title = escapeMarkdownV2(lines[0]);
+    const bodyLines = lines.slice(1, 6);
 
     const quotedBody = bodyLines.length
       ? bodyLines.map(l => `> ${escapeMarkdownV2(l)}`).join("\n")
       : "";
 
-    // 北京时间
     const time = new Date(commit.timestamp).toLocaleString(
       "zh-CN",
       {
@@ -39,11 +37,11 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    const text = `
-    🚀 Leap Off 更新
+    // 🔥 关键在这里：精确控制换行
+    const text =
+`\n🚀 Leap Off 更新
 
-${title}
-${quotedBody ? `\n\n${quotedBody}` : ""}
+${title}${quotedBody ? `\n${quotedBody}` : ""}
 
 ————————
 
