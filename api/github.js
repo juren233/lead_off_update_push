@@ -20,6 +20,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).send("No commit found");
     }
 
+    // 拆分 commit message
     const lines = commit.message
       .split("\n")
       .map(l => l.trim())
@@ -28,10 +29,12 @@ module.exports = async function handler(req, res) {
     const title = escapeHTML(lines[0]);
     const bodyLines = lines.slice(1, 6);
 
+    // HTML 引用块（干净样式，无引号）
     const blockquote = bodyLines.length
       ? `<blockquote>${escapeHTML(bodyLines.join("\n"))}</blockquote>`
       : "";
 
+    // 北京时间
     const time = new Date(commit.timestamp).toLocaleString(
       "zh-CN",
       {
@@ -40,14 +43,13 @@ module.exports = async function handler(req, res) {
       }
     );
 
+    // 消息正文（最终定版）
     const text = `
 🚀 Leap Off 更新
 
-${title}
-${blockquote ? `\n${blockquote}` : ""}
+${title}${blockquote}
 
-————————
-
+Committed at
 🕒 ${time}
 `.trim();
 
@@ -55,7 +57,9 @@ ${blockquote ? `\n${blockquote}` : ""}
       `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           chat_id: process.env.TG_CHAT_ID,
           text,
@@ -76,7 +80,7 @@ ${blockquote ? `\n${blockquote}` : ""}
     );
 
     if (!resp.ok) {
-      console.error("Telegram error:", await resp.text());
+      console.error("Telegram API error:", await resp.text());
     }
 
     return res.status(200).send("ok");
