@@ -7,11 +7,13 @@ function escapeHTML(text) {
 
 module.exports = async function handler(req, res) {
   try {
+    // 兜底解析 payload
     let payload = req.body;
     if (!payload || typeof payload !== "object") {
       payload = JSON.parse(req.body);
     }
 
+    // 兼容不同 push 形态
     const commits = payload.commits || [];
     const commit =
       payload.head_commit || commits[commits.length - 1];
@@ -29,7 +31,7 @@ module.exports = async function handler(req, res) {
     const title = escapeHTML(lines[0]);
     const bodyLines = lines.slice(1, 6);
 
-    // HTML 引用块（干净样式，无引号）
+    // HTML 引用块（干净样式）
     const blockquote = bodyLines.length
       ? `<blockquote>${escapeHTML(bodyLines.join("\n"))}</blockquote>`
       : "";
@@ -43,7 +45,7 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    // 消息正文（最终定版）
+    // 消息正文（最终定稿）
     const text = `
 🚀 Leap Off 更新
 
@@ -53,6 +55,7 @@ Committed at
 🕒 ${time}
 `.trim();
 
+    // 发送 Telegram 消息（双按钮）
     const resp = await fetch(
       `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage`,
       {
@@ -71,6 +74,10 @@ Committed at
                 {
                   text: "🔗 查看 Commit",
                   url: commit.url,
+                },
+                {
+                  text: "🎮 尝鲜体验",
+                  url: "https://leapoff.vercel.app/",
                 },
               ],
             ],
