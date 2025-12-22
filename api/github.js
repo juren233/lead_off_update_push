@@ -7,13 +7,11 @@ function escapeHTML(text) {
 
 module.exports = async function handler(req, res) {
   try {
-    // 兜底解析 payload
     let payload = req.body;
     if (!payload || typeof payload !== "object") {
       payload = JSON.parse(req.body);
     }
 
-    // 兼容不同 push 形态
     const commits = payload.commits || [];
     const commit =
       payload.head_commit || commits[commits.length - 1];
@@ -22,7 +20,6 @@ module.exports = async function handler(req, res) {
       return res.status(200).send("No commit found");
     }
 
-    // 拆分 commit message
     const lines = commit.message
       .split("\n")
       .map(l => l.trim())
@@ -31,12 +28,10 @@ module.exports = async function handler(req, res) {
     const title = escapeHTML(lines[0]);
     const bodyLines = lines.slice(1, 6);
 
-    // HTML 引用块（干净样式）
     const blockquote = bodyLines.length
       ? `<blockquote>${escapeHTML(bodyLines.join("\n"))}</blockquote>`
       : "";
 
-    // 北京时间
     const time = new Date(commit.timestamp).toLocaleString(
       "zh-CN",
       {
@@ -45,17 +40,16 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    // 消息正文（最终定稿）
-    const text = `
-🚀 Leap Off 更新
+    // ❗关键修正点：不用 <br>，不用 trim()
+    const text =
+`🚀 Leap Off 更新
 
-${title}<br><br>${blockquote}
+${title}
+${blockquote ? `\n${blockquote}` : ""}
 
 Committed at
-🕒 ${time}
-`.trim();
+🕒 ${time}`;
 
-    // 发送 Telegram 消息（双按钮）
     const resp = await fetch(
       `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage`,
       {
