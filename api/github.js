@@ -40,7 +40,6 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    // ❗关键修正点：不用 <br>，不用 trim()
     const text =
 `🚀 Leap Off 更新
 
@@ -70,8 +69,12 @@ Committed at
                   url: commit.url,
                 },
                 {
-                  text: "🎮 尝鲜体验",
+                  text: "🎮 尝鲜体验（Vercel 国际访问）",
                   url: "https://leapoff.vercel.app/",
+                },
+                {
+                  text: "🎮 尝鲜体验（Netlify 国内直连）",
+                  url: "https://leapoff.netlify.app/",
                 },
               ],
             ],
