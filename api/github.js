@@ -68,10 +68,14 @@ Committed at
                   text: "🔗 查看 Commit",
                   url: commit.url,
                 },
+              ],
+              [
                 {
                   text: "🎮 尝鲜体验（Vercel 国际访问）",
                   url: "https://leapoff.vercel.app/",
                 },
+              ],
+              [
                 {
                   text: "🎮 尝鲜体验（Netlify 国内直连）",
                   url: "https://leapoff.netlify.app/",
