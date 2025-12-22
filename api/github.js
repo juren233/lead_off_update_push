@@ -49,7 +49,7 @@ module.exports = async function handler(req, res) {
     const text = `
 🚀 Leap Off 更新
 
-${title}${blockquote ? `\n${blockquote}` : ""}
+${title}<br><br>${blockquote}
 
 Committed at
 🕒 ${time}
