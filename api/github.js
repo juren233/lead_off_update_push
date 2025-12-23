@@ -77,8 +77,8 @@ Committed at
               ],
               [
                 {
-                  text: "🎮 尝鲜体验（Netlify 国内直连）",
-                  url: "https://leapoff.netlify.app/",
+                  text: "🎮 尝鲜体验（Cloudflare 大陆直连）",
+                  url: "https://leapoff.pages.dev/",
                 },
               ],
             ],
