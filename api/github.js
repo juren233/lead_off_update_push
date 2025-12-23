@@ -26,7 +26,7 @@ module.exports = async function handler(req, res) {
       .filter(Boolean);
 
     const title = escapeHTML(lines[0]);
-    const bodyLines = lines.slice(1, 6);
+    const bodyLines = lines.slice(1);
 
     const blockquote = bodyLines.length
       ? `<blockquote>${escapeHTML(bodyLines.join("\n"))}</blockquote>`
